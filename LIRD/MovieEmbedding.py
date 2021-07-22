@@ -32,40 +32,49 @@ class EmbeddingsGenerator:
 
     def generate_input(self, user_id):
         """
-        Returns a context and a target for the user_id
-        context: user's history with one random movie removed
-        target: id of random removed movie
+        每次从一个user的session中, 随机抽取一个movie及其上下文, 其中target为该movie的one-hot vector, 其上下文即长度相同的0-1向量
+        :param user_id:
+        :return: context, target 从一个user的session中,随机抽取的一个movie及其上下文
         """
         user_movies_count = len(self.user_movies[user_id])
-        # picking random movie
-        random_index = np.random.randint(0, user_movies_count - 1)  # -1 avoids taking the last movie
-        # setting target
+        # 从session中随机选一个movie
+        random_user_movie_index = np.random.randint(0, user_movies_count - 1)  # 避免选中session末尾的movie
+        # 生成该movie的one-hot vector
         target = np.zeros((1, self.movie_count))
-        target[0][self.user_movies[user_id][random_index]] = 1
-        # setting context
+        target[0][self.user_movies[user_id][random_user_movie_index]] = 1
+        # 生成该movie的上下文向量
         context = np.zeros((1, self.movie_count))
-        context[0][self.user_movies[user_id][:random_index] + self.user_movies[user_id][random_index + 1:]] = 1
+        context_movie_id_list = self.user_movies[user_id][:random_user_movie_index] + self.user_movies[user_id][random_user_movie_index + 1:]
+        context[0][context_movie_id_list] = 1
         return context, target
 
-    def train(self, nb_epochs=300, batch_size=10000):
+    def train(self, epochs=300, batch_size=10000):
         """
-        Trains the model from train_users's history
+        基于用户session训练embedding
+        :param epochs:
+        :param batch_size:
+        :return:
         """
-        for i in range(nb_epochs):
-            print('%d/%d' % (i + 1, nb_epochs))
+        print(f"Training Movies' Embedding...")
+        for i in range(epochs):
+            print(f'epoch: {i+1}/{epochs}')
             batch = [self.generate_input(user_id=np.random.choice(self.train_users) - 1) for _ in range(batch_size)]
-            X_train = np.array([b[0] for b in batch])
+            # 把一个batch中的所有
+            x_train = np.array([b[0] for b in batch])
             y_train = np.array([b[1] for b in batch])
-            self.m.fit(X_train, y_train, epochs=1, validation_split=0.5)
+            self.m.fit(x_train, y_train, epochs=1, validation_split=0.5)
 
     def test(self, test_users, batch_size=100000):
         """
-        Returns [loss, accuracy] on the test set
+        在session测试集上测试movie embedding的准确率
+        :param test_users: 用于测试的userId列表
+        :param batch_size:
+        :return: [loss, accuracy]
         """
         batch_test = [self.generate_input(user_id=np.random.choice(test_users) - 1) for _ in range(batch_size)]
-        X_test = np.array([b[0] for b in batch_test])
+        x_test = np.array([b[0] for b in batch_test])
         y_test = np.array([b[1] for b in batch_test])
-        return self.m.evaluate(X_test, y_test)
+        return self.m.evaluate(x_test, y_test)
 
     def save_embeddings(self, file_name):
         """
@@ -109,8 +118,11 @@ class Embeddings:
 
 
 def read_file(data_path):
-    """ Load data from train.csv or test.csv. """
-
+    """
+    从csv中读取样本并整理数据格式
+    :param data_path:
+    :return: [state,n_state,action,reward]每个单元格为一个list
+    """
     data = pd.read_csv(data_path, sep=';')
     for col in ['state', 'n_state', 'action_reward']:
         data[col] = [np.array([[np.int(k) for k in ee.split('&')] for ee in e.split('|')]) for e in data[col]]

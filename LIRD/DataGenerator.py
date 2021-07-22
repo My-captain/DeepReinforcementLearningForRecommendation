@@ -3,7 +3,7 @@ import random
 import pandas as pd
 
 
-class DataGenerator():
+class DataGenerator:
     def __init__(self, data_path, item_path):
         """
         Load data from the DB MovieLens

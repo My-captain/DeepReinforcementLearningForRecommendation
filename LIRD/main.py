@@ -141,11 +141,11 @@ data = read_file('train.csv')
 if True:  # Generate embeddings?
     eg = EmbeddingsGenerator(data_generator.user_for_train,
                              pd.read_csv('ml-100k/u.data', sep='\t', names=['userId', 'itemId', 'rating', 'timestamp']))
-    eg.train(nb_epochs=300)
+    eg.train(epochs=300)
     train_loss, train_accuracy = eg.test(data_generator.user_for_train)
-    print('Train set: Loss=%.4f ; Accuracy=%.1f%%' % (train_loss, train_accuracy * 100))
+    print(f'[MovieEmbedding]Train set: Loss={train_loss:.4f} ; Accuracy={train_accuracy*100:.1f}%')
     test_loss, test_accuracy = eg.test(data_generator.user_for_test)
-    print('Test set: Loss=%.4f ; Accuracy=%.1f%%' % (test_loss, test_accuracy * 100))
+    print(f'[MovieEmbedding]Test set: Loss={test_loss:.4f} ; Accuracy={test_accuracy*100:.1f}%')
     eg.save_embeddings('embeddings.csv')
 
 embeddings = Embeddings(read_embeddings('embeddings.csv'))
