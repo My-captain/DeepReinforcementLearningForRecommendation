@@ -1,7 +1,8 @@
 import numpy as np
+import pandas as pd
 
 
-class Environment():
+class Environment:
     def __init__(self, data, embeddings, alpha, gamma, fixed_length):
         self.embeddings = embeddings
 

@@ -78,11 +78,12 @@ class EmbeddingsGenerator:
 
     def save_embeddings(self, file_name):
         """
-        Generates a csv file containg the vector embedding for each movie.
+        Generates a csv file containing the vector embedding for each movie.
         """
         inp = self.m.input  # input placeholder
         outputs = [layer.output for layer in self.m.layers]  # all layer outputs
-        functor = K.function([inp, K.learning_phase()], outputs)  # evaluation function
+        # functor = K.function([inp, K.learning_phase()], outputs)  # evaluation function
+        functor = K.function([inp], outputs)  # evaluation function
 
         # append embeddings to vectors
         vectors = []
@@ -97,7 +98,6 @@ class EmbeddingsGenerator:
         # saves as a csv file
         embeddings = pd.DataFrame(vectors, columns=['item_id', 'vectors']).astype({'item_id': 'int32'})
         embeddings.to_csv(file_name, sep=';', index=False)
-        files.download(file_name)
 
 
 class Embeddings:
