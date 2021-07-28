@@ -82,8 +82,8 @@ class EmbeddingsGenerator:
         """
         inp = self.m.input  # input placeholder
         outputs = [layer.output for layer in self.m.layers]  # all layer outputs
-        # functor = K.function([inp, K.learning_phase()], outputs)  # evaluation function
-        functor = K.function([inp], outputs)  # evaluation function
+        functor = K.function([inp, K.learning_phase()], outputs)  # evaluation function
+        # functor = K.function([inp], outputs)  # evaluation function
 
         # append embeddings to vectors
         vectors = []
@@ -114,7 +114,7 @@ class Embeddings:
         return self.item_embeddings[item_index]
 
     def embed(self, item_list):
-        return np.array([self.get_embedding(item) for item in item_list])
+        return np.array([self.get_embedding(item-1) for item in item_list])
 
 
 def read_file(data_path):
