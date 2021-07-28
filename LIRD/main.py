@@ -139,6 +139,7 @@ data_generator.write_csv('test.csv', data_generator.test, states_nums=[history_l
 data = read_file('train.csv')
 
 if True:  # Generate embeddings?
+    print("Training Movie embeddings...")
     eg = EmbeddingsGenerator(data_generator.user_for_train,
                              pd.read_csv('ml-100k/u.data', sep='\t', names=['userId', 'itemId', 'rating', 'timestamp']))
     eg.train(epochs=300)
@@ -203,7 +204,7 @@ def test_actor(actor, test_df, embeddings, dict_embeddings, ra_length, history_l
 # Train, Target=False
 ratings, unknown, random_seen = test_actor(actor, data_generator.train, embeddings, dict_embeddings, ra_length, history_length,
                                            target=False, nb_rounds=10)
-print('%0.1f%% unknown' % (100 * unknown / (len(ratings) + unknown)))
+print('%0.1f%% unknown' % (100 * unknown / (len(ratings) + unknown)))  # 93.4% unknown
 
 plt.subplot(1, 2, 1)
 plt.hist(ratings)
@@ -216,7 +217,7 @@ plt.show()
 # Train, Target=False
 ratings, unknown, random_seen = test_actor(actor, data_generator.train, embeddings, dict_embeddings, ra_length, history_length,
                                            target=True, nb_rounds=10)
-print('%0.1f%% unknown' % (100 * unknown / (len(ratings) + unknown)))
+print('%0.1f%% unknown' % (100 * unknown / (len(ratings) + unknown)))   # 93.3% unknown
 
 plt.subplot(1, 2, 1)
 plt.hist(ratings)
