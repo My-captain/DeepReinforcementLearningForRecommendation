@@ -5,7 +5,7 @@ import pandas as pd
 class Environment:
     def __init__(self, data, embeddings, alpha, gamma, fixed_length):
         self.embeddings = embeddings
-
+        # 将state、action等列中的item_id转为对应的embedding并存入embedded_data
         self.embedded_data = pd.DataFrame()
         self.embedded_data['state'] = [np.array([embeddings.get_embedding(item_id)
                                                  for item_id in row['state']]) for _, row in data.iterrows()]
@@ -18,8 +18,10 @@ class Environment:
         self.fixed_length = fixed_length
         self.current_state = self.reset()
         self.groups = self.get_groups()
+        self.init_state = None
 
     def reset(self):
+        # 随机取样一个样本, 取state中第一个item对应的embedding作为init_state
         self.init_state = self.embedded_data['state'].sample(1).values[0]
         return self.init_state
 
@@ -49,7 +51,7 @@ class Environment:
         return cumulated_reward, self.current_state
 
     def get_groups(self):
-        """ Calculate average state/action value for each group. Equation (3). """
+        """根据公式3对reward的排列进行分组"""
 
         groups = []
         for rewards, group in self.embedded_data.groupby(['reward']):
