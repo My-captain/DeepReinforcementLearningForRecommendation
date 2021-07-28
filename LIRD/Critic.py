@@ -8,10 +8,10 @@ class Critic():
     def __init__(self, sess, state_space_size, action_space_size, history_length, embedding_size, tau, learning_rate,
                  scope='critic'):
         self.sess = sess
-        self.state_space_size = state_space_size
-        self.action_space_size = action_space_size
-        self.history_length = history_length
-        self.embedding_size = embedding_size
+        self.state_space_size = state_space_size    # 12*100    样本中state的item数量*embedding向量大小
+        self.action_space_size = action_space_size  # 4*100     样本中action的item数量*embedding向量大小
+        self.history_length = history_length    # 历史记录长度  12
+        self.embedding_size = embedding_size    # embedding向量大小
         self.tau = tau
         self.learning_rate = learning_rate
         self.scope = scope
